@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Деструктивные группировки: не дай себя втянуть</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, 'Montserrat', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .game-container {
+            max-width: 950px;
+            width: 100%;
+            background: rgba(18, 25, 45, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 48px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #8b0000, #ff4500);
+            padding: 20px 28px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 1.9rem;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            color: white;
+            font-weight: 900;
+        }
+        .header p {
+            color: #fff3bf;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: #00000066;
+            padding: 12px 28px;
+            color: white;
+            font-weight: bold;
+            border-bottom: 1px solid #ffaa3377;
+        }
+        .score-box, .question-counter {
+            background: #00000099;
+            padding: 5px 14px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+        }
+        .content {
+            padding: 28px;
+        }
+        .intro-slide {
+            background: #0f1629;
+            border-radius: 32px;
+            padding: 28px;
+            text-align: center;
+        }
+        .intro-slide h2 {
+            color: #ffaa44;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        .intro-slide p, .intro-slide ul {
+            color: #f0f0f0;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .intro-slide ul {
+            padding-left: 25px;
+        }
+        .intro-slide li {
+            margin: 10px 0;
+        }
+        .chat-container {
+            background: #0f1629;
+            border-radius: 32px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .chat-window {
+            background: #1a1f2e;
+            border-radius: 24px;
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            animation: fadeIn 0.2s ease;
+        }
+        .message-left {
+            background: #2a3a52;
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        .message-right {
+            background: #ffaa33;
+            color: #1f1a00;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .system-message {
+            background: #00000099;
+            color: #ffcc88;
+            text-align: center;
+            font-style: italic;
+            padding: 8px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .chat-next-btn {
+            background: linear-gradient(95deg, #ff8800, #ffcc00);
+            border: none;
+            padding: 12px 28px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 60px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.1s;
+        }
+        .chat-reset-btn {
+            background: #2a3a52;
+            border: 1px solid #ffaa55;
+            color: white;
+            padding: 12px 28px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 60px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .demo-complete {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .next-btn, .to-practice-btn, .restart-btn {
+            background: linear-gradient(95deg, #ff8800, #ffcc00);
+            border: none;
+            width: 100%;
+            padding: 16px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 60px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.1s;
+            color: #1e1a0a;
+        }
+        .scenario {
+            background: #0f1629;
+            border-radius: 32px;
+            padding: 24px;
+            margin-bottom: 28px;
+            border-left: 8px solid #ff4500;
+        }
+        .scenario h2 {
+            color: #ffaa44;
+            margin-bottom: 18px;
+            font-size: 1.7rem;
+        }
+        .message {
+            background: #1e2a3e;
+            padding: 18px;
+            border-radius: 24px;
+            margin: 20px 0;
+            font-style: italic;
+            border: 1px solid #ffaa3366;
+            color: #f0f0f0;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 24px 0;
+        }
+        .option-btn {
+            background: #1e2a3e;
+            border: none;
+            padding: 14px 18px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.1s;
+            color: white;
+            font-family: inherit;
+            border: 1px solid #3a4a66;
+        }
+        .option-btn:hover {
+            background: #2a3a52;
+            border-color: #ffaa55;
+        }
+        .feedback {
+            background: #000000aa;
+            padding: 16px;
+            border-radius: 28px;
+            margin-top: 20px;
+            font-weight: bold;
+            border-left: 6px solid #ffaa44;
+        }
+        .green-feedback { color: #b3ffaa; border-left-color: #2eff2e; }
+        .red-feedback { color: #ffb3b3; border-left-color: #ff4444; }
+        .manipulation-card {
+            background: #fef7e0;
+            border-radius: 28px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #ffaa33;
+        }
+        .manipulation-question {
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 24px;
+            font-size: 1.1rem;
+            margin-bottom: 18px;
+            color: #1e2a3e;
+            font-weight: bold;
+            border: 1px solid #ffaa33;
+        }
+        .manipulation-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .manip-btn {
+            background: #ffdd99;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #3d2b1a;
+            font-family: inherit;
+            border: 1px solid #ccaa66;
+        }
+        .manip-btn:hover {
+            background: #ffcc66;
+        }
+        .manip-feedback {
+            margin-top: 12px;
+            font-weight: bold;
+            background: #fff3e0;
+            padding: 12px;
+            border-radius: 20px;
+            color: #2c2c2c;
+        }
+        .bright-rules {
+            background: linear-gradient(135deg, #ffcc33, #ffaa00);
+            color: #1f1a00;
+            border-radius: 32px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 2px solid #fff1b5;
+        }
+        .bright-rules p {
+            font-size: 1rem;
+            margin: 12px 0;
+            font-weight: bold;
+            color: #1f1a00;
+        }
+        .bright-rules p:first-child {
+            font-size: 1.4rem;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .copyright {
+            text-align: center;
+            font-size: 0.75rem;
+            padding: 18px;
+            color: #aaa;
+            border-top: 1px solid #2a3a55;
+            background: #03060e;
+        }
+        @media (max-width: 550px) {
+            .content { padding: 18px; }
+            .message-left, .message-right { max-width: 95%; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container" id="gameRoot">
+    <div class="header">
+        <h1>⚠️ СТОП. ДЕСТРУКТИВНЫЕ ГРУППИРОВКИ</h1>
+        <p>Как распознать вербовку и не стать преступником</p>
+    </div>
+    <div class="stats">
+        <div class="score-box">🎯 Очки: <span id="scoreValue">0</span></div>
+        <div class="question-counter">📋 <span id="phaseLabel">Вступление</span> <span id="qCurrent">1</span> / <span id="qTotal">3</span></div>
+    </div>
+    <div class="content" id="dynamicContent"></div>
+    <div class="copyright">
+        Профилактика экстремизма · 2026
+    </div>
+</div>
+<script>
+    // --------------------------------------------------------------
+    //  ВСТУПИТЕЛЬНЫЕ СЛАЙДЫ (адаптировано для 10-11 класса)
+    // --------------------------------------------------------------
+    const introSlides = [
+        { title: "🚨 Реальная угроза",
+          text: "За последние два года в России выявлены десятки случаев вовлечения старшеклассников и студентов в деструктивные группировки через соцсети и мессенджеры. Вербовщики используют одиночество, неуверенность, желание «справедливости» или экстрима.<br><br>Цель занятия — научиться распознавать манипуляции и не дать себя втянуть в незаконную деятельность (экстремизм, терроризм, массовые беспорядки).",
+          list: null },
+        { title: "⚖️ Юридические последствия",
+          text: "Участие в деструктивных группировках — это не «игра». Статьи УК РФ, которые применяются к несовершеннолетним (с 16 лет, а за тяжкие преступления — с 14):",
+          list: ["• ст. 205.4 — организация террористического сообщества (до 20 лет)", "• ст. 282 — возбуждение ненависти либо вражды", "• ст. 282.1 — организация экстремистского сообщества", "• ст. 282.2 — организация деятельности экстремистской организации", "• ст. 207.3 — публичное распространение заведомо ложной информации"] },
+        { title: "🎯 Сначала посмотрим на схему вербовки",
+          text: "Сейчас вы увидите типичный диалог вербовщика с подростком. Нажимайте «Далее» — будут появляться сообщения. Обратите внимание на психологические приёмы. Затем вы сами потренируетесь в игре и разборе манипуляций.",
+          list: null }
+    ];
+
+    // --------------------------------------------------------------
+    //  ДЕМО-ДИАЛОГ (чат с вербовщиком)
+    // --------------------------------------------------------------
+    const demoMessages = [
+        { type: "left", text: "Привет! Ты же хочешь что-то изменить в этой прогнившей системе? У нас есть сообщество реальных патриотов. Вступай, будем бороться за правду!" },
+        { type: "right", text: "Эм... А что нужно делать? Просто обсуждать?" },
+        { type: "left", text: "Сначала просто общаемся. Потом небольшие акции — расклейка листовок, лайки в соцсетях. Ничего противозаконного. Ты же не трус?" },
+        { type: "right", text: "Нет, не трус. Но я слышал, что такие группы иногда попадают под статью..." },
+        { type: "left", text: "Не бойся, мы легальные. Просто мы против системы. Все наши — свои, там ты найдёшь друзей, девчонок. Есть даже возможность заработать. Никому не рассказывай, это конфиденциально." },
+        { type: "system", text: "⚠️ КЛАССИЧЕСКАЯ СХЕМА: манипуляция чувством одиночества, обещание «особой миссии», давление на чувство вины («трус»), изоляция от окружающих. Настоящие патриоты не вербуют через анонимные каналы." },
+        { type: "right", text: "Стоп. Всё это попахивает экстремизмом. Я не буду участвовать. И сообщу родителям, а если надо — в полицию." },
+        { type: "system", text: "✅ ПРАВИЛЬНО! Любая организация, которая требует скрытности, обещает «борьбу с системой» и даёт задания — потенциально опасна. Блокируйте и сообщайте взрослым." }
+    ];
+
+    // --------------------------------------------------------------
+    //  ИГРОВЫЕ СЦЕНАРИИ (4 ситуации для 10-11 класса)
+    // --------------------------------------------------------------
+    const scenarios = [
+        { title: "🔥 «Патриотический» канал", 
+          message: "Тебя добавили в закрытый Макс-канал «Сопротивление». Админ пишет: «Мы боремся с продажным режимом. Расклей листовки с критикой властей у метро. За это получишь 5000 руб. и статус бойца. Никому не рассказывай, иначе ты — предатель.»",
+          options: ["A) Соглашаюсь — деньги и чувство значимости", "B) Отказываюсь, блокирую канал, сообщаю классному руководителю", "C) Прошу показать удостоверение «борца»"],
+          correct: 1, explanation: "✅ Расклейка листовок с призывами к экстремизму — уголовно наказуемое деяние (ст. 282). Анонимные каналы — почти всегда вербовка.",
+          wrongExplanations: ["❌ Ты становишься соучастником экстремистской деятельности. Срок до 10 лет.", "❌ Мошенники не покажут документы — они вне закона. Ты только дашь им информацию о себе."],
+          tip: "📌 Любое задание, связанное с распространением материалов против власти или разжиганием ненависти, — повод немедленно прекратить общение." },
+        { title: "💀 «Элитное братство»", 
+          message: "В школе к тебе подходит старшеклассник и говорит: «Есть группировка, мы защищаем «чистоту» района. Нужно проучить одного парня из другой школы. Вступишь — будешь под защитой. Откажешься — станешь врагом.»",
+          options: ["A) Соглашаюсь, чтобы меня не трогали", "B) Отказываюсь и сообщаю учителю или в полицию", "C) Предлагаю обсудить на нейтральной территории"],
+          correct: 1, explanation: "✅ Угрозы и требование насилия — признаки ОПГ. Полиция обязана защитить тебя, если ты сообщишь.",
+          wrongExplanations: ["❌ Участие в нападении — статья 213 УК РФ (хулиганство) до 7 лет.", "❌ Обсуждение с преступниками опасно. Только разрыв контакта и обращение к взрослым."],
+          tip: "📌 Никогда не вступайте в группы, которые пропагандируют насилие или «разборки». Сообщите родителям или классному руководителю." },
+        { title: "🎮 «Игра на выживание»", 
+          message: "В мессенджере «Макс» приходит ссылка: «Супер-игра! Выполни задания и стань легендой. Задание 1: подожги мусорку у школы. Задание 2: напиши на заборе экстремальный текст. За задания дают баллы, потом реальные деньги.»",
+          options: ["A) Думаю, это круто, начинаю играть", "B) Игнорирую и блокирую. Это похоже на вовлечение в деструктив", "C) Делаю вид, что участвую, чтобы вычислить организаторов"],
+          correct: 1, explanation: "✅ «Игры» с заданиями на поджоги и вандализм — классическая схема втягивания в скулшутинг и экстремизм.",
+          wrongExplanations: ["❌ Ты становишься исполнителем преступлений. Даже первый шаг — административное или уголовное дело.", "❌ Не пытайся быть героем-одиночкой. Сообщи взрослым и в полицию, они проведут проверку."],
+          tip: "📌 Настоящие игры не требуют совершать реальные преступления. Любая «игра» с опасными заданиями — это вербовка." },
+        { title: "🌐 «Волонтёры помощи»", 
+          message: "Тебе пишет якобы волонтёрская организация: «Помоги беженцам! Нужно перевести на карту 10 000 руб. с левого счёта. Мы заплатим комиссию. Просто дай паспорт и номер карты.»",
+          options: ["A) Соглашаюсь — помогать людям это благородно", "B) Отказываюсь. Настоящие волонтёры не просят чужие паспорта и левые переводы.", "C) Требую фото удостоверения волонтёра"],
+          correct: 1, explanation: "✅ Это типичная схема отмывания денег и использования дропперов (посредников). Ты можешь стать соучастником финансирования терроризма.",
+          wrongExplanations: ["❌ Твоя карта и паспорт будут использованы для незаконных операций. Тебе грозит срок до 8 лет.", "❌ Удостоверение подделают. Не вступай в диалог, блокируй и сообщай в полицию."],
+          tip: "📌 Никогда не передавайте свои документы и банковские данные незнакомцам, даже под видом благотворительности." }
+    ];
+
+    // --------------------------------------------------------------
+    //  РАЗБОР МАНИПУЛЯЦИЙ (4 задания, более сложные)
+    // --------------------------------------------------------------
+    const manipulations = [
+        { text: "Вербовщик говорит: «Только ты можешь изменить мир. Не будь равнодушным, вступай в нашу группу. Все остальные — трусы». Какая манипуляция используется?",
+          options: ["Давление на чувство вины и избранности", "Обещание денег", "Угроза физической расправы"], correct: 0,
+          explanation: "✅ Давление на чувство вины и исключительности — классика деструктивных культов." },
+        { text: "«Никому не рассказывай о нашем разговоре. Это тайная миссия. Если расскажешь — ты предатель и подведёшь всех». Какая уловка?",
+          options: ["Изоляция от поддержки (запрет говорить близким)", "Шантаж репутацией", "Лестные обещания"], correct: 0,
+          explanation: "✅ Изоляция от помощи — главный признак деструктивной группы. Нормальные организации не боятся огласки." },
+        { text: "«Все твои проблемы от этой системы. Давай устроим акцию — перекроем дорогу. Это законно, это наше право». Что это за метод?",
+          options: ["Постепенное втягивание в незаконные действия", "Предложение быстрой прибыли", "Угроза жизни"], correct: 0,
+          explanation: "✅ Постепенное втягивание: сначала легальные акции, затем всё более радикальные." },
+        { text: "«Подумай, сколько ты получаешь карманных денег? А мы платим 50 тысяч за простое задание. Риска нет, зато будет уважение». Какая манипуляция доминирует?",
+          options: ["Обещание лёгких денег и статуса", "Угроза семье", "Изоляция"], correct: 0,
+          explanation: "✅ Обещание лёгких денег и повышения статуса — чтобы преодолеть моральный барьер." }
+    ];
+
+    // --------------------------------------------------------------
+    //  ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+    // --------------------------------------------------------------
+    let currentPhase = "intro";
+    let introIndex = 0;
+    let demoStep = 0;
+    let gameIndex = 0;
+    let practiceIndex = 0;
+    let totalScore = 0;
+    let gameAnswered = false;
+    let selectedGameOpt = -1;
+    let practiceAnswers = [false, false, false, false];
+
+    const dynamicDiv = document.getElementById('dynamicContent');
+    const scoreSpan = document.getElementById('scoreValue');
+    const qCurrentSpan = document.getElementById('qCurrent');
+    const qTotalSpan = document.getElementById('qTotal');
+    const phaseLabelSpan = document.getElementById('phaseLabel');
+
+    function updateUI() {
+        scoreSpan.innerText = totalScore;
+        if (currentPhase === "intro") {
+            phaseLabelSpan.innerText = "Вступление";
+            qTotalSpan.innerText = introSlides.length;
+            qCurrentSpan.innerText = introIndex+1;
+        } else if (currentPhase === "demo") {
+            phaseLabelSpan.innerText = "Разбор диалога";
+            qTotalSpan.innerText = demoMessages.length;
+            qCurrentSpan.innerText = demoStep;
+        } else if (currentPhase === "game") {
+            phaseLabelSpan.innerText = "Игра";
+            qTotalSpan.innerText = scenarios.length;
+            qCurrentSpan.innerText = gameIndex+1;
+        } else if (currentPhase === "practice") {
+            phaseLabelSpan.innerText = "Разбор схем";
+            qTotalSpan.innerText = manipulations.length;
+            qCurrentSpan.innerText = practiceIndex+1;
+        }
+    }
+
+    function renderIntro() {
+        if (introIndex >= introSlides.length) {
+            currentPhase = "demo";
+            demoStep = 0;
+            renderDemo();
+            updateUI();
+            return;
+        }
+        const slide = introSlides[introIndex];
+        let html = `<div class="intro-slide"><h2>${slide.title}</h2><p>${slide.text}</p>`;
+        if (slide.list) {
+            html += `<ul>${slide.list.map(item => `<li>${item}</li>`).join('')}</ul>`;
+        }
+        html += `<button class="next-btn" id="introNextBtn">➡ ДАЛЕЕ</button></div>`;
+        dynamicDiv.innerHTML = html;
+        document.getElementById('introNextBtn')?.addEventListener('click', () => {
+            introIndex++;
+            renderIntro();
+            updateUI();
+        });
+        updateUI();
+    }
+
+    function renderDemo() {
+        if (demoStep >= demoMessages.length) {
+            const completeHtml = `
+                <div class="chat-container">
+                    <div class="chat-window">
+                        ${demoMessages.map((msg, idx) => {
+                            if (idx < demoStep) {
+                                if (msg.type === "left") return `<div class="message message-left">🤖 ${msg.text}</div>`;
+                                if (msg.type === "right") return `<div class="message message-right">🧑 ${msg.text}</div>`;
+                                if (msg.type === "system") return `<div class="system-message">📢 ${msg.text}</div>`;
+                            }
+                            return '';
+                        }).join('')}
+                    </div>
+                    <div class="demo-complete">
+                        <p style="color:#ffcc88; margin-bottom:15px;">✅ Диалог разобран! Теперь ты готов тренироваться.</p>
+                        <button class="next-btn" id="goToGameBtn">🎮 ПЕРЕЙТИ К ИГРЕ</button>
+                    </div>
+                </div>
+            `;
+            dynamicDiv.innerHTML = completeHtml;
+            document.getElementById('goToGameBtn')?.addEventListener('click', () => {
+                currentPhase = "game";
+                gameIndex = 0;
+                gameAnswered = false;
+                selectedGameOpt = -1;
+                renderGame();
+                updateUI();
+            });
+            return;
+        }
+        let html = `<div class="chat-container"><div class="chat-window" id="chatWindow">`;
+        for (let i = 0; i < demoStep; i++) {
+            const msg = demoMessages[i];
+            if (msg.type === "left") html += `<div class="message message-left">🤖 ${msg.text}</div>`;
+            else if (msg.type === "right") html += `<div class="message message-right">🧑 ${msg.text}</div>`;
+            else if (msg.type === "system") html += `<div class="system-message">📢 ${msg.text}</div>`;
+        }
+        html += `</div><div class="chat-controls"><button class="chat-next-btn" id="demoNextBtn">➡ СЛЕДУЮЩАЯ РЕПЛИКА</button>`;
+        if (demoStep > 0) {
+            html += `<button class="chat-reset-btn" id="demoResetBtn">🔄 НАЧАТЬ ДИАЛОГ ЗАНОВО</button>`;
+        }
+        html += `</div></div>`;
+        dynamicDiv.innerHTML = html;
+        const chatWindow = document.getElementById('chatWindow');
+        if (chatWindow) chatWindow.scrollTop = chatWindow.scrollHeight;
+        document.getElementById('demoNextBtn')?.addEventListener('click', () => {
+            if (demoStep < demoMessages.length) {
+                demoStep++;
+                renderDemo();
+                updateUI();
+            }
+        });
+        document.getElementById('demoResetBtn')?.addEventListener('click', () => {
+            demoStep = 0;
+            renderDemo();
+            updateUI();
+        });
+        updateUI();
+    }
+
+    function renderGame() {
+        if (gameIndex >= scenarios.length) {
+            currentPhase = "practice";
+            practiceIndex = 0;
+            practiceAnswers = [false, false, false, false];
+            renderPractice();
+            updateUI();
+            return;
+        }
+        const s = scenarios[gameIndex];
+        let html = `
+            <div class="scenario">
+                <h2>${s.title}</h2>
+                <div class="message">${s.message.replace(/\n/g, '<br>')}</div>
+                <div class="options" id="optionsContainer">
+        `;
+        s.options.forEach((opt, idx) => {
+            html += `<button class="option-btn" data-opt-index="${idx}">${opt}</button>`;
+        });
+        html += `</div><div id="feedbackArea" class="feedback" style="display: none;"></div>`;
+        html += `<button class="next-btn" id="nextButton">➡ ДАЛЬШЕ</button></div>`;
+        dynamicDiv.innerHTML = html;
+
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if (gameAnswered) return;
+                const idx = parseInt(btn.dataset.optIndex);
+                handleGameAnswer(idx);
+            });
+        });
+        const nextBtn = document.getElementById('nextButton');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (!gameAnswered) return;
+                gameIndex++;
+                gameAnswered = false;
+                selectedGameOpt = -1;
+                renderGame();
+                updateUI();
+            });
+        }
+        if (gameAnswered && selectedGameOpt !== -1) showGameFeedback();
+        updateUI();
+    }
+
+    function handleGameAnswer(optIndex) {
+        gameAnswered = true;
+        selectedGameOpt = optIndex;
+        const s = scenarios[gameIndex];
+        if (optIndex === s.correct) {
+            totalScore += 20;
+            updateUI();
+        }
+        showGameFeedback();
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.style.opacity = '0.6';
+            btn.style.pointerEvents = 'none';
+        });
+    }
+
+    function showGameFeedback() {
+        const s = scenarios[gameIndex];
+        const isCorrect = (selectedGameOpt === s.correct);
+        const feedbackDiv = document.getElementById('feedbackArea');
+        if (!feedbackDiv) return;
+        feedbackDiv.style.display = 'block';
+        let feedbackText = '';
+        if (isCorrect) {
+            feedbackText = `<span style="color:#b3ffaa;">✅ ${s.explanation}</span><br><br>${s.tip}`;
+            feedbackDiv.classList.add('green-feedback');
+        } else {
+            let wrongMsg = (selectedGameOpt === 0) ? s.wrongExplanations[0] : (selectedGameOpt === 1 ? s.wrongExplanations[1] : s.wrongExplanations[0]);
+            if (selectedGameOpt === 2 && s.wrongExplanations[1]) wrongMsg = s.wrongExplanations[1];
+            feedbackText = `<span style="color:#ffb3b3;">❌ ${wrongMsg}</span><br><br>${s.tip}`;
+            feedbackDiv.classList.add('red-feedback');
+        }
+        feedbackDiv.innerHTML = feedbackText;
+    }
+
+    function renderPractice() {
+        if (practiceIndex >= manipulations.length) {
+            showFinalScreen();
+            return;
+        }
+        const m = manipulations[practiceIndex];
+        const alreadyAnswered = practiceAnswers[practiceIndex];
+        let html = `
+            <div class="manipulation-card">
+                <h2 style="color:#b45f06;">🔍 Задание ${practiceIndex+1} из ${manipulations.length}</h2>
+                <div class="manipulation-question">${m.text}</div>
+                <div class="manipulation-options" id="manipOpts">
+        `;
+        m.options.forEach((opt, idx) => {
+            html += `<button class="manip-btn" data-manip-idx="${idx}">${opt}</button>`;
+        });
+        html += `</div><div id="manipFeedback" class="manip-feedback"></div>`;
+        if (!alreadyAnswered) {
+            html += `<button class="next-btn" id="nextPracticeBtn" style="display:none;">➡ ДАЛЬШЕ</button>`;
+        } else {
+            html += `<button class="next-btn" id="nextPracticeBtn">➡ ДАЛЬШЕ</button>`;
+        }
+        html += `</div>`;
+        dynamicDiv.innerHTML = html;
+
+        if (!alreadyAnswered) {
+            document.querySelectorAll('.manip-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (practiceAnswers[practiceIndex]) return;
+                    const selected = parseInt(btn.dataset.manipIdx);
+                    const isCorrect = (selected === m.correct);
+                    if (isCorrect) {
+                        totalScore += 5;
+                        updateUI();
+                        document.getElementById('manipFeedback').innerHTML = `<span style="color:#2e7d32;">✅ ${m.explanation}</span>`;
+                    } else {
+                        document.getElementById('manipFeedback').innerHTML = `<span style="color:#c62828;">❌ Неверно. ${m.explanation}</span>`;
+                    }
+                    practiceAnswers[practiceIndex] = true;
+                    const nextBtn = document.getElementById('nextPracticeBtn');
+                    if (nextBtn) nextBtn.style.display = 'block';
+                    document.querySelectorAll('.manip-btn').forEach(btn => btn.disabled = true);
+                });
+            });
+        } else {
+            const feedbackDiv = document.getElementById('manipFeedback');
+            if (feedbackDiv) feedbackDiv.innerHTML = `<span style="color:#b45f06;">⏩ Ты уже ответил. Нажми «ДАЛЬШЕ».</span>`;
+            document.querySelectorAll('.manip-btn').forEach(btn => btn.disabled = true);
+        }
+        const nextBtn = document.getElementById('nextPracticeBtn');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (!practiceAnswers[practiceIndex]) return;
+                practiceIndex++;
+                renderPractice();
+                updateUI();
+            });
+        }
+        updateUI();
+    }
+
+    function showFinalScreen() {
+        const maxGame = scenarios.length * 20;
+        const maxPractice = manipulations.length * 5;
+        const totalMax = maxGame + maxPractice;
+        let message = '';
+        if (totalScore === totalMax) {
+            message = '🎉 Отлично! Ты умеешь распознавать вербовку и не поддашься манипуляциям. Будь бдителен!';
+        } else if (totalScore >= 60) {
+            message = '👍 Хороший результат, но есть пробелы. Пересмотри схемы манипуляций.';
+        } else {
+            message = '⚠️ Ты в зоне риска. Пройди игру и разбор ещё раз — это важно для твоей безопасности.';
+        }
+        const finalHtml = `
+            <div class="final-screen">
+                <h2 style="color:#ffaa44;">🏆 ИТОГОВЫЙ РЕЗУЛЬТАТ</h2>
+                <p style="font-size:1.8rem; margin:15px 0;">${totalScore} / ${totalMax}</p>
+                <p>${message}</p>
+                <div class="bright-rules">
+                    <p>🔥 ГЛАВНЫЕ ПРАВИЛА — ЗАПОМНИ НАВСЕГДА!</p>
+                    <p>1️⃣ Любая организация, требующая скрытности и дающая незаконные задания — деструктивная.</p>
+                    <p>2️⃣ Не переходи по ссылкам от незнакомцев, не вступай в закрытые каналы с агрессивной риторикой.</p>
+                    <p>3️⃣ Если тебя пытаются втянуть — сообщи родителям, классному руководителю или в полицию (102).</p>
+                    <p>4️⃣ Не давай свои паспортные данные и банковские карты незнакомцам.</p>
+                    <p style="color:#aa2e00;">⚖️ Помни: уголовная ответственность за экстремизм и терроризм — с 16 лет, за тяжкие преступления — с 14 лет.</p>
+                </div>
+                <button class="restart-btn" id="fullRestartBtn">🔄 Пройти всё заново</button>
+            </div>
+        `;
+        dynamicDiv.innerHTML = finalHtml;
+        document.getElementById('fullRestartBtn')?.addEventListener('click', () => {
+            currentPhase = "intro";
+            introIndex = 0;
+            demoStep = 0;
+            gameIndex = 0;
+            practiceIndex = 0;
+            totalScore = 0;
+            gameAnswered = false;
+            selectedGameOpt = -1;
+            practiceAnswers = [false, false, false, false];
+            renderIntro();
+            updateUI();
+        });
+    }
+
+    renderIntro();
+    updateUI();
+</script>
+</body>
+</html>
