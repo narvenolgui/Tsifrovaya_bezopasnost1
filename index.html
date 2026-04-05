@@ -293,6 +293,22 @@
             border-radius: 20px;
             color: #2c2c2c;
         }
+        /* Финальный экран — светлый фон, тёмный текст */
+        .final-screen {
+            background: #fef7e0;
+            border-radius: 32px;
+            padding: 24px;
+            text-align: center;
+            color: #1f1a00;
+            border: 2px solid #ffaa33;
+        }
+        .final-screen h2 {
+            color: #b45f06;
+        }
+        .final-screen p {
+            color: #2c2c2c;
+            font-size: 1.1rem;
+        }
         .bright-rules {
             background: linear-gradient(135deg, #ffcc33, #ffaa00);
             color: #1f1a00;
@@ -699,7 +715,7 @@
         }
         const finalHtml = `
             <div class="final-screen">
-                <h2 style="color:#ffaa44;">🏆 ИТОГОВЫЙ РЕЗУЛЬТАТ</h2>
+                <h2>🏆 ИТОГОВЫЙ РЕЗУЛЬТАТ</h2>
                 <p style="font-size:1.8rem; margin:15px 0;">${totalScore} / ${totalMax}</p>
                 <p>${message}</p>
                 <div class="bright-rules">
