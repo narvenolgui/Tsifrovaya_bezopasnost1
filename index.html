@@ -107,32 +107,36 @@
         }
         .message {
             max-width: 80%;
-            padding: 10px 16px;
+            padding: 12px 18px;
             border-radius: 20px;
             font-size: 0.95rem;
             line-height: 1.4;
             animation: fadeIn 0.2s ease;
+            font-weight: 500;
         }
         .message-left {
-            background: #2a3a52;
-            color: white;
+            background: #2e4a6e;
+            color: #ffffff;
             align-self: flex-start;
             border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         .message-right {
             background: #ffaa33;
             color: #1f1a00;
             align-self: flex-end;
             border-bottom-right-radius: 4px;
+            font-weight: bold;
         }
         .system-message {
-            background: #00000099;
-            color: #ffcc88;
+            background: #000000cc;
+            color: #ffdd99;
             text-align: center;
             font-style: italic;
-            padding: 8px;
+            padding: 10px;
             border-radius: 20px;
             font-size: 0.85rem;
+            border: 1px solid #ffaa55;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -195,14 +199,16 @@
             margin-bottom: 18px;
             font-size: 1.7rem;
         }
-        .message {
+        .message-text {
             background: #1e2a3e;
             padding: 18px;
             border-radius: 24px;
             margin: 20px 0;
             font-style: italic;
             border: 1px solid #ffaa3366;
-            color: #f0f0f0;
+            color: #f5f5f5;
+            font-weight: normal;
+            line-height: 1.4;
         }
         .options {
             display: flex;
@@ -229,21 +235,25 @@
             border-color: #ffaa55;
         }
         .feedback {
-            background: #000000aa;
+            background: #000000cc;
             padding: 16px;
             border-radius: 28px;
             margin-top: 20px;
             font-weight: bold;
             border-left: 6px solid #ffaa44;
+            color: #f5f5f5;
         }
-        .green-feedback { color: #b3ffaa; border-left-color: #2eff2e; }
-        .red-feedback { color: #ffb3b3; border-left-color: #ff4444; }
+        .green-feedback { color: #ccffcc; border-left-color: #2eff2e; }
+        .red-feedback { color: #ffcccc; border-left-color: #ff4444; }
         .manipulation-card {
             background: #fef7e0;
             border-radius: 28px;
             padding: 20px;
             margin-bottom: 20px;
             border: 2px solid #ffaa33;
+        }
+        .manipulation-card h2 {
+            color: #b45f06;
         }
         .manipulation-question {
             background: #ffffff;
@@ -330,12 +340,12 @@
     </div>
     <div class="content" id="dynamicContent"></div>
     <div class="copyright">
-        Профилактика экстремизма · 2026
+        Профилактика экстремизма · 2026 narven_olgui
     </div>
 </div>
 <script>
     // --------------------------------------------------------------
-    //  ВСТУПИТЕЛЬНЫЕ СЛАЙДЫ (адаптировано для 10-11 класса)
+    //  ВСТУПИТЕЛЬНЫЕ СЛАЙДЫ
     // --------------------------------------------------------------
     const introSlides = [
         { title: "🚨 Реальная угроза",
@@ -364,11 +374,11 @@
     ];
 
     // --------------------------------------------------------------
-    //  ИГРОВЫЕ СЦЕНАРИИ (4 ситуации для 10-11 класса)
+    //  ИГРОВЫЕ СЦЕНАРИИ (4 для 10-11 класса)
     // --------------------------------------------------------------
     const scenarios = [
         { title: "🔥 «Патриотический» канал", 
-          message: "Тебя добавили в закрытый Макс-канал «Сопротивление». Админ пишет: «Мы боремся с продажным режимом. Расклей листовки с критикой властей у метро. За это получишь 5000 руб. и статус бойца. Никому не рассказывай, иначе ты — предатель.»",
+          message: "Тебя добавили в закрытый Telegram-канал «Сопротивление». Админ пишет: «Мы боремся с продажным режимом. Расклей листовки с критикой властей у метро. За это получишь 5000 руб. и статус бойца. Никому не рассказывай, иначе ты — предатель.»",
           options: ["A) Соглашаюсь — деньги и чувство значимости", "B) Отказываюсь, блокирую канал, сообщаю классному руководителю", "C) Прошу показать удостоверение «борца»"],
           correct: 1, explanation: "✅ Расклейка листовок с призывами к экстремизму — уголовно наказуемое деяние (ст. 282). Анонимные каналы — почти всегда вербовка.",
           wrongExplanations: ["❌ Ты становишься соучастником экстремистской деятельности. Срок до 10 лет.", "❌ Мошенники не покажут документы — они вне закона. Ты только дашь им информацию о себе."],
@@ -394,7 +404,7 @@
     ];
 
     // --------------------------------------------------------------
-    //  РАЗБОР МАНИПУЛЯЦИЙ (4 задания, более сложные)
+    //  РАЗБОР МАНИПУЛЯЦИЙ (4 задания)
     // --------------------------------------------------------------
     const manipulations = [
         { text: "Вербовщик говорит: «Только ты можешь изменить мир. Не будь равнодушным, вступай в нашу группу. Все остальные — трусы». Какая манипуляция используется?",
@@ -548,7 +558,7 @@
         let html = `
             <div class="scenario">
                 <h2>${s.title}</h2>
-                <div class="message">${s.message.replace(/\n/g, '<br>')}</div>
+                <div class="message-text">${s.message.replace(/\n/g, '<br>')}</div>
                 <div class="options" id="optionsContainer">
         `;
         s.options.forEach((opt, idx) => {
@@ -603,12 +613,12 @@
         feedbackDiv.style.display = 'block';
         let feedbackText = '';
         if (isCorrect) {
-            feedbackText = `<span style="color:#b3ffaa;">✅ ${s.explanation}</span><br><br>${s.tip}`;
+            feedbackText = `<span style="color:#ccffcc;">✅ ${s.explanation}</span><br><br>${s.tip}`;
             feedbackDiv.classList.add('green-feedback');
         } else {
             let wrongMsg = (selectedGameOpt === 0) ? s.wrongExplanations[0] : (selectedGameOpt === 1 ? s.wrongExplanations[1] : s.wrongExplanations[0]);
             if (selectedGameOpt === 2 && s.wrongExplanations[1]) wrongMsg = s.wrongExplanations[1];
-            feedbackText = `<span style="color:#ffb3b3;">❌ ${wrongMsg}</span><br><br>${s.tip}`;
+            feedbackText = `<span style="color:#ffcccc;">❌ ${wrongMsg}</span><br><br>${s.tip}`;
             feedbackDiv.classList.add('red-feedback');
         }
         feedbackDiv.innerHTML = feedbackText;
